@@ -97,7 +97,7 @@ impl PathBuilder {
         let mut path_builder = LyonPathBuilder::new();
 
         if let Some(segment) = self.segments.first() {
-            let mut last_pos = match segment {
+            let last_pos = match segment {
                 Point(point) => point,
                 CubicBezierCurve { .. } | QuadraticBezierCurve { .. } => {
                     panic!("Path has to start with a Point")
@@ -110,15 +110,12 @@ impl PathBuilder {
                 match segment {
                     Point(point) => {
                         path_builder.line_to(*point);
-                        last_pos = point;
                     }
                     CubicBezierCurve { to, ctrl1, ctrl2 } => {
                         path_builder.cubic_bezier_to(*ctrl1, *ctrl2, *to);
-                        last_pos = to;
                     }
                     QuadraticBezierCurve { to, ctrl } => {
                         path_builder.quadratic_bezier_to(*ctrl, *to);
-                        last_pos = to;
                     }
                 }
             }
