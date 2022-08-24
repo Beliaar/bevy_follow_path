@@ -1,0 +1,14 @@
+[package]
+name = "bevy_follow_path"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+bevy = "0.8.0"
+euclid = "0.22.7"
+lyon_geom = "1.0"
+bevy_prototype_lyon = { version="0.6", optional = true }
+[features]
+debug_draw = ["dep:bevy_prototype_lyon"]
