@@ -9,7 +9,7 @@ use bevy_prototype_lyon::{
 };
 use lyon_geom::{CubicBezierSegment, QuadraticBezierSegment};
 
-pub enum PathSegment {
+pub(crate) enum PathSegment {
     Point(Vec2),
     CubicBezierCurve { to: Vec2, ctrl1: Vec2, ctrl2: Vec2 },
     QuadraticBezierCurve { to: Vec2, ctrl: Vec2 },
@@ -32,7 +32,7 @@ impl PathBuilder {
         }
     }
 
-    pub fn add_point(&mut self, point: Vec2) {
+    pub fn add_line_to(&mut self, point: Vec2) {
         self.segments.push(Point(point));
     }
 
@@ -44,7 +44,7 @@ impl PathBuilder {
         self.segments.push(QuadraticBezierCurve { to, ctrl });
     }
 
-    pub fn build(&self) -> Vec<Vec2> {
+    pub fn build_points(&self) -> Vec<Vec2> {
         let mut path_points = Vec::new();
 
         if let Some(segment) = self.segments.first() {
@@ -92,43 +92,49 @@ impl PathBuilder {
         path_points
     }
 
-    #[cfg(feature = "debug_draw")]
-    pub fn build_debug_draw_bundle(&self) -> Option<ShapeBundle> {
+    pub fn build_path(&self) -> Path2 {
+        let points = self.build_points();
+        Path2 {points, is_loop: false}
+    }
+
+    pub fn build_looping_path(&self) -> Path2 {
+        let points = self.build_points();
+        Path2 {points, is_loop: true}
+    }
+
+    pub fn build_debug_draw_bundle(&self) -> ShapeBundle {
         let mut path_builder = LyonPathBuilder::new();
 
         if let Some(segment) = self.segments.first() {
-            let last_pos = match segment {
-                Point(point) => point,
-                CubicBezierCurve { .. } | QuadraticBezierCurve { .. } => {
-                    panic!("Path has to start with a Point")
-                }
-            };
+            if let Point(last_pos) = segment {
+                path_builder.move_to(*last_pos);
 
-            path_builder.move_to(*last_pos);
-
-            for segment in self.segments.iter().skip(1) {
-                match segment {
-                    Point(point) => {
-                        path_builder.line_to(*point);
-                    }
-                    CubicBezierCurve { to, ctrl1, ctrl2 } => {
-                        path_builder.cubic_bezier_to(*ctrl1, *ctrl2, *to);
-                    }
-                    QuadraticBezierCurve { to, ctrl } => {
-                        path_builder.quadratic_bezier_to(*ctrl, *to);
+                for segment in self.segments.iter().skip(1) {
+                    match segment {
+                        Point(point) => {
+                            path_builder.line_to(*point);
+                        }
+                        CubicBezierCurve { to, ctrl1, ctrl2 } => {
+                            path_builder.cubic_bezier_to(*ctrl1, *ctrl2, *to);
+                        }
+                        QuadraticBezierCurve { to, ctrl } => {
+                            path_builder.quadratic_bezier_to(*ctrl, *to);
+                        }
                     }
                 }
+
+                let line = path_builder.build();
+                let bundle = GeometryBuilder::build_as(
+                    &line,
+                    DrawMode::Stroke(StrokeMode::new(Color::BLACK, 1.0)),
+                    Transform::default(),
+                );
+                bundle
+            } else {
+                panic!("Path has to start with a Point") // Panic, because currently this code should not be able to be reached.
             }
-
-            let line = path_builder.build();
-            let bundle = GeometryBuilder::build_as(
-                &line,
-                DrawMode::Stroke(StrokeMode::new(Color::BLACK, 1.0)),
-                Transform::default(),
-            );
-            Some(bundle)
         } else {
-            None
+            panic!("Path cannot be empty") // Panic, because currently this code should not be able to be reached.
         }
     }
 }

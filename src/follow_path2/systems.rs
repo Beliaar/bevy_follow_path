@@ -3,7 +3,7 @@ use bevy::math::Vec3Swizzles;
 use bevy::prelude::*;
 use euclid::approxeq::ApproxEq;
 
-pub(crate) fn advance_paths(
+pub fn advance_paths(
     mut query: Query<(Entity, &mut Transform, &mut FollowPath2)>,
     mut commands: Commands,
 ) {
@@ -11,7 +11,7 @@ pub(crate) fn advance_paths(
         let (distance, cur_target) = {
             let cur_target = follow_path.path.points[follow_path.cur_target];
             let distance = cur_target.distance(transform.translation.xy());
-            if distance.approx_eq_eps(&0., &0.5) {
+            if distance.approx_eq_eps(&0., &follow_path.epsilon) {
                 let cur_target = follow_path.cur_target + 1;
                 if cur_target < follow_path.path.points.len() {
                     follow_path.cur_target = cur_target;

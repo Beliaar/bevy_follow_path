@@ -6,4 +6,5 @@ pub struct FollowPath2 {
     pub path: Path2,
     pub cur_target: usize,
     pub speed: f32,
+    pub epsilon: f32,
 }
