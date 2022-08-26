@@ -1,6 +1,6 @@
 [package]
 name = "bevy_follow_path"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 license = "MIT"
 description = "Provides components and systems that enable entities to follow a path"
@@ -12,7 +12,7 @@ repository = "https://github.com/Beliaar/bevy_follow_path"
 [dependencies]
 bevy = "0.8.0"
 euclid = "0.22.7"
-lyon_geom = "1.0.1"
-bevy_prototype_lyon = { version="0.6.0", optional = true }
+bezier-nd = "0.1.4"
+geo-nd = "0.1.3"
 [features]
-debug_draw = ["dep:bevy_prototype_lyon"]
+debug_draw = []
