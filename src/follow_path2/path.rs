@@ -21,7 +21,7 @@ pub(crate) enum PathSegment {
 }
 
 /// Contains the data for the path to follow
-#[derive(Default)]
+#[derive(Default, Clone)]
 pub struct Path2 {
     /// The list of [Points](bevy::math::f32::Vec2) to follow
     pub points: Vec<Vec2>,
