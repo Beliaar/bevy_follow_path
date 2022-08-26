@@ -9,41 +9,57 @@ use bevy_prototype_lyon::{
 };
 use lyon_geom::{CubicBezierSegment, QuadraticBezierSegment};
 
+/// Possible segments to build a 2D path from
+///
+/// The last point of the segment will always connect to the first point of the next.
 pub(crate) enum PathSegment {
     Point(Vec2),
+    /// Points of a cubic bezier curve, with 2 control points.
     CubicBezierCurve { to: Vec2, ctrl1: Vec2, ctrl2: Vec2 },
+    /// Points of a quadratic bezier curve, with a single control point
     QuadraticBezierCurve { to: Vec2, ctrl: Vec2 },
 }
 
+/// Contains the data for the path to follow
 #[derive(Default)]
 pub struct Path2 {
+    /// The list of [Points](bevy::math::f32::Vec2) to follow
     pub points: Vec<Vec2>,
+    /// Whether the path circles back to the first point, or not.
     pub is_loop: bool,
 }
 
+/// Builder to simplify making [paths](Path2) using segments that are connected to each other
 pub struct PathBuilder {
     segments: Vec<PathSegment>,
 }
 
 impl PathBuilder {
+    /// Create the builder with the first point set to *start*
     pub fn new(start: Vec2) -> Self {
         Self {
             segments: vec![Point(start)],
         }
     }
 
+    /// Add a line from the previous point to the passed [point](bevy::math::f32::Vec2)
     pub fn add_line_to(&mut self, point: Vec2) {
         self.segments.push(Point(point));
     }
 
+    /// Add a bezier curve from the previous to the specified end [point](bevy::math::f32::Vec2)
+    /// using 2 control points
     pub fn add_cubic_bezier_curve(&mut self, to: Vec2, ctrl1: Vec2, ctrl2: Vec2) {
         self.segments.push(CubicBezierCurve { to, ctrl1, ctrl2 });
     }
 
+    /// Add a bezier curve from the previous to the specified end [point](bevy::math::f32::Vec2)
+    /// using a single control point
     pub fn add_quadratic_bezier_curve(&mut self, to: Vec2, ctrl: Vec2) {
         self.segments.push(QuadraticBezierCurve { to, ctrl });
     }
 
+    /// Build a list of [points](bevy::math::f32::Vec2) from the current segments
     pub fn build_points(&self) -> Vec<Vec2> {
         let mut path_points = Vec::new();
 
@@ -92,16 +108,20 @@ impl PathBuilder {
         path_points
     }
 
+    /// Build a non looping [Path](Path2) from the current segments
     pub fn build_path(&self) -> Path2 {
         let points = self.build_points();
         Path2 {points, is_loop: false}
     }
 
+    /// Build a looping [Path](Path2) from the current segments
     pub fn build_looping_path(&self) -> Path2 {
         let points = self.build_points();
         Path2 {points, is_loop: true}
     }
 
+    /// Build a [bundle](ShapeBundle) for drawing the path using [bevy_prototype_lyon]
+    #[cfg(feature = "debug_draw")]
     pub fn build_debug_draw_bundle(&self) -> ShapeBundle {
         let mut path_builder = LyonPathBuilder::new();
 

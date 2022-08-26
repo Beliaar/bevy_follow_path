@@ -2,6 +2,10 @@
 name = "bevy_follow_path"
 version = "0.1.0"
 edition = "2021"
+license = "MIT"
+description = "Provides components and systems that enable entities to follow a path"
+homepage = "https://github.com/Beliaar/bevy_follow_path"
+repository = "https://github.com/Beliaar/bevy_follow_path"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 

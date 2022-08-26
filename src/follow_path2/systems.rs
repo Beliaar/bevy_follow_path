@@ -3,6 +3,7 @@ use bevy::math::Vec3Swizzles;
 use bevy::prelude::*;
 use euclid::approxeq::ApproxEq;
 
+/// Moves entities along their set path
 pub fn advance_paths(
     mut query: Query<(Entity, &mut Transform, &mut FollowPath2)>,
     mut commands: Commands,
