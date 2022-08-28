@@ -1,6 +1,6 @@
 [package]
 name = "bevy_follow_path"
-version = "0.2.0"
+version = "0.2.1"
 edition = "2021"
 license = "MIT"
 description = "Provides components and systems that enable entities to follow a path"
